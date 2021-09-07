@@ -15,3 +15,4 @@ console.log();
 console.log("The variable " + empty + " is of type " + typeof empty);
 console.log("Variable with value of null will always be object"); //from what I researched it is not "null" for legacy reasons
 console.log();
+console.log();
