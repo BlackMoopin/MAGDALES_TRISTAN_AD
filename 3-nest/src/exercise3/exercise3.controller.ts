@@ -5,9 +5,9 @@ import { Exercise3Service } from './exercise3.service';
 export class Exercise3Controller {
     constructor(private readonly e3: Exercise3Service){}
 
-    @Get("/helloWorld/:name")
+    @Get("/hello/:name")
     getHello(@Param('name') name:string): string {
-        return this.e3.helloWorld();
+        return this.e3.hello(name);
     }
 
     @Get("/loopsTriangle/:height")
@@ -16,9 +16,9 @@ export class Exercise3Controller {
         return this.e3.loopsTriangle(parsedHeight);
     }
 
-    @Get("/primeNumbers/:num")
-    primeNumbers(num:number) {
+    @Get("/prime/:num")
+    prime(@Param('num') num:string) {
         var parsedNum = parseInt(num);
-        return this.e3.loopsTriangle(parsedNum);
+        return this.e3.prime(parsedNum);
     }
 }
