@@ -11,14 +11,14 @@ export class UserController {
         return this.userService.userLog();
     }
 
-    @Post("/register")
-    postUser(@Body() body:any){
-        return this.userService.addUser(body);
-    }
-
     @Get("/:id")
     getOneUser(@Param("id") id:string){
         return this.userService.getUser(id);
+    }
+
+    @Post("/register")
+    postUser(@Body() body:any){
+        return this.userService.addUser(body);
     }
 
     @Put("/:id")
@@ -26,7 +26,6 @@ export class UserController {
         return this.userService.replaceUser(body, id);
     }
 
-    //to finish
     @Patch("/:id")
     updateInfo(@Body() body:any, @Param("id") id:string){
         return this.userService.updateUser(body, id);
