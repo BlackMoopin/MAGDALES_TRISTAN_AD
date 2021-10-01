@@ -26,15 +26,21 @@ export class UserService {
                         user.email,
                         user.password,
                     );
-                    if (this.saveToDB(newUser)){
-                        if (DEBUG) this.userLog();
-                        return {
-                            success: true,
-                            data: newUser.toJson(),
-                        };
+                    var validBody: {valid: boolean; data: string} = Helper.validBodyPut(user);
+                    if (validBody.valid){
+                        if (this.saveToDB(newUser)){
+                            if (DEBUG) this.userLog();
+                                return {
+                                    success: true,
+                                    data: newUser.toJson(),
+                                };
+                        } else{
+                            throw new Error(`Generic Database Error`);
+                        } 
                     } else {
-                        throw new Error(`Generic Database Error`);
+                        throw Error(`Payload is lacking`);
                     }
+                    
                 } else {
                     throw new Error(`${user.email} is already used by another user!`)
                 }
@@ -52,17 +58,22 @@ export class UserService {
     //put - finished
     replaceUser(user:any, id:string): CRUDReturn{
         try {
+            var validBody: {valid: boolean; data: string} = Helper.validBodyPut(user);
+            if (validBody.valid){
             var newUser:User = this.users.get(id);
-            if(newUser.replaceAllValues(user)){
-                return {
-                    success: true,
-                    data: newUser.toJson(),
-                };
+                if(newUser.replaceAllValues(user)){
+                    return {
+                        success: true,
+                        data: newUser.toJson(),
+                    };
+                } else {
+                    return {
+                        success: false,
+                        data: `Invalid or insufficient input(s) is entered.`,
+                    };
+                }
             } else {
-                return {
-                    success: false,
-                    data: `Invalid or insufficient input(s) is entered.`,
-                };
+                throw new Error(validBody.data);
             }
         } catch (error) {
             return { success: false, data: `Error replacing account, ${error.message}`};
@@ -125,7 +136,12 @@ export class UserService {
                 this.users.delete(id);
                 return {
                     success: true,
-                    data: `User has been deleted succesfully`,
+                    data: `User has been deleted succesfully.`,
+                };
+            } else {
+                return {
+                    success: true,
+                    data: `User is not in the database.`,
                 };
             }
         } catch (error) {
