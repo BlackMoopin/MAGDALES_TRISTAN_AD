@@ -35,6 +35,7 @@ export class UserService {
         for (const [key, user] of this.users.entries()){
             users.push(user);
         }
+        console.log(users);
         return users;
     }
 
