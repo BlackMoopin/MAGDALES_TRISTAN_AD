@@ -117,8 +117,6 @@ export class User {
         return changed;
     }
 
-    
-
     matches(term: string): boolean {
         var keys: Array<string> = Helper.describeClass(User);
         keys = Helper.removeItemOnce(keys, 'password');

@@ -1,4 +1,4 @@
-import { All, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CRUDReturn } from './crud_return.interface';
 import { Helper } from './user.resource/helper';
 import { User } from './user.model';
@@ -13,6 +13,14 @@ export class UserService {
     password: string;
     age:number;
     name: string;
+
+    private populatedData : Map<string,User> = Helper.populate();
+
+    constructor()
+    {
+        this.users = Helper.populate();
+        console.log(this.users);
+    }
 
     //post - finished
     addUser(user:any): CRUDReturn{
@@ -60,21 +68,27 @@ export class UserService {
         try {
             var validBody: {valid: boolean; data: string} = Helper.validBodyPut(user);
             if (validBody.valid){
-            var newUser:User = this.users.get(id);
-                if(newUser.replaceAllValues(user)){
-                    return {
-                        success: true,
-                        data: newUser.toJson(),
-                    };
+                var newUser:User = this.users.get(id);
+                if (!this.checkExistingUsers(user.email)){
+                    if(newUser.replaceAllValues(user)){
+                        return {
+                            success: true,
+                            data: newUser.toJson(),
+                        };
+                    } else {
+                        return {
+                            success: false,
+                            data: `Invalid or insufficient input(s) is entered.`,
+                        };
+                    }
+                } return {
+                    success: false,
+                    data: `Email ${user.email} already in database.`,
+                };
+                    
                 } else {
-                    return {
-                        success: false,
-                        data: `Invalid or insufficient input(s) is entered.`,
-                    };
+                    throw new Error(validBody.data);
                 }
-            } else {
-                throw new Error(validBody.data);
-            }
         } catch (error) {
             return { success: false, data: `Error replacing account, ${error.message}`};
         }      
@@ -86,17 +100,25 @@ export class UserService {
             var validBody: {valid: boolean; data: string} = Helper.validBody(user);
             if (validBody.valid){
                 var newUser:User = this.users.get(id);
-                if(newUser.update(user)){
-                    return {
-                        success: true,
-                        data: newUser.toJson(),
-                    };
+                if (!this.checkExistingUsers(user.email)){
+                    if(newUser.update(user)){
+                        return {
+                            success: true,
+                            data: newUser.toJson(),
+                        };
+                    } else {
+                        return {
+                            success: false,
+                            data: `Invalid Input is entered.`,
+                        };
+                    }
                 } else {
                     return {
                         success: false,
-                        data: `Invalid Input is entered.`,
+                        data: `Email ${user.email} already in database.`,
                     };
                 }
+                
             } else {
                 throw new Error(validBody.data);
             }
@@ -139,9 +161,9 @@ export class UserService {
                     data: `User has been deleted succesfully.`,
                 };
             } else {
-                return {
-                    success: true,
-                    data: `User is not in the database.`,
+                return { 
+                    success: false, 
+                    data: `User ${id} is not in the database`, 
                 };
             }
         } catch (error) {
