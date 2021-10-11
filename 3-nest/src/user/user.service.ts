@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CRUDReturn } from './crud_return.interface';
 import { Helper } from './user.resource/helper';
 import { User } from './user.model';
+import * as admin from 'firebase-admin';
 
 const DEBUG: boolean = true;
 
@@ -14,6 +15,8 @@ export class UserService {
     age:number;
     name: string;
 
+    private DB = admin.firestore();
+
     private populatedData : Map<string,User> = Helper.populate();
 
     constructor()
@@ -22,21 +25,21 @@ export class UserService {
         console.log(this.users);
     }
 
-    //post - finished
-    addUser(user:any): CRUDReturn{
+    async addUser(user:any): Promise<CRUDReturn>{
         try {
             var validBody: {valid: boolean; data: string} = Helper.validBody(user);
             if (validBody.valid){
-                if (!this.checkExistingUsers(user.email)){
+                var exists = await this.checkExistingUsers(user.email);
+                if (!exists){
                     var newUser: User = new User(
                         user.name,
-                        user.age,
+                        user.age,   
                         user.email,
-                        user.password,
+                        user.password
                     );
                     var validBody: {valid: boolean; data: string} = Helper.validBodyPut(user);
                     if (validBody.valid){
-                        if (this.saveToDB(newUser)){
+                        if (await this.saveToDB(newUser)){
                             if (DEBUG) this.userLog();
                                 return {
                                     success: true,
@@ -52,7 +55,6 @@ export class UserService {
                 } else {
                     throw new Error(`${user.email} is already used by another user!`)
                 }
-                
             } else {
                 throw new Error(validBody.data);
             }
@@ -63,13 +65,13 @@ export class UserService {
         
     }
 
-    //put - finished
-    replaceUser(user:any, id:string): CRUDReturn{
+    async replaceUser(user:any, id:string): Promise<CRUDReturn>{
         try {
             var validBody: {valid: boolean; data: string} = Helper.validBodyPut(user);
             if (validBody.valid){
                 var newUser:User = this.users.get(id);
-                if (!this.checkExistingUsers(user.email)){
+                var exists = await this.checkExistingUsers(user.email);
+                if (!exists){
                     if(newUser.replaceAllValues(user)){
                         return {
                             success: true,
@@ -94,13 +96,12 @@ export class UserService {
         }      
     }
 
-    //patch - finished
-    updateUser(user:any, id:string) : CRUDReturn{
+    async updateUser(user:any, id:string) : Promise<CRUDReturn>{
         try {
             var validBody: {valid: boolean; data: string} = Helper.validBody(user);
             if (validBody.valid){
                 var newUser:User = this.users.get(id);
-                if (!this.checkExistingUsers(user.email)){
+                if (!await this.checkExistingUsers(user.email)){
                     if(newUser.update(user)){
                         return {
                             success: true,
@@ -118,7 +119,6 @@ export class UserService {
                         data: `Email ${user.email} already in database.`,
                     };
                 }
-                
             } else {
                 throw new Error(validBody.data);
             }
@@ -128,73 +128,117 @@ export class UserService {
         
     }
 
-    //finish
-    userLog(): CRUDReturn {
+    async userLog(): Promise<CRUDReturn> {
         var results: Array<any> = [];
-        for (const user of this.users.values()){
-            results.push(user.toJson());
-            console.log(results);
-        }
-        return { success: results.length>0, data: results};
-    }
-
-    //finish
-    getUser(id:string) : CRUDReturn{
-        if (this.users.has(id)){
-            return { success: true, data: this.users.get(id).toJson()};
-        } else {
-            console.log(id + " does not exist in the database!");
-            return { 
-                success: false, 
-                data: `User ${id} is not in the database`, 
-            };
-        }
-    }
-
-    //finish
-    deleteUser(id:string){
         try {
-            if (this.users.has(id)){
-                this.users.delete(id);
-                return {
+            var allUsers = await this.userLogObjects();
+            allUsers.forEach((user)=> {
+                results.push(user.toJsonID());
+            });
+            return {success: true, data: results};
+        } catch (error) {
+            return null;
+        }
+    }
+
+    async userLogObjects(): Promise<Array<User>> {
+        var results: Array<User> = [];
+        try {
+            var dbData: FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData> = 
+                await this.DB.collection("users").get();
+            dbData.forEach((doc)=>{
+                if (doc.exists) {
+                    var data = doc.data();
+                    results.push( new User(
+                        data["name"],
+                        data["age"],
+                        data["email"],
+                        data["password"],
+                        data["id"],
+                    ));
+                }
+            });
+            return results;         
+        } catch (error) {
+            return null;
+        }
+    }
+
+    async getUser(id:string) : Promise<CRUDReturn>{
+        try {
+            var result = await this.DB.collection("users").doc(id).get();
+            if (result.exists){
+                return{
                     success: true,
-                    data: `User has been deleted succesfully.`,
+                    data: result.data(),
+                };
+            } else if (id === null){
+                return{
+                    success: false,
+                    data: `Invalid inputs!`,
                 };
             } else {
-                return { 
-                    success: false, 
-                    data: `User ${id} is not in the database`, 
+                return{
+                    success: false,
+                    data: `User ${id} does not exist in the database!`,
                 };
-            }
+            } 
         } catch (error) {
-            return { 
-                success: false, 
-                data: `User ${id} is not in the database`, 
+            console.log(error);
+            return{
+                success: false,
+                data: error,
             };
         }
     }
 
-    //finish
-    check(email: string, password: string): CRUDReturn{
-        var check: number = 0;
-        try {
-            for (const user of this.users.values()){
-                if (user.matches(email)){
-                    if(user.login(password)){
-                        return user.login(password);
-                        check = 1;
-                        break;
-                    } else {
-                        throw new Error(`Invalid Password for ${email}!`);
-                    }
-                } 
+    //maybe finished?
+    async deleteUser(id:string){
+        try{
+            var result = await this.DB.collection("users").doc(id).get();
+            if (result.exists){
+                await this.DB.collection("users").doc(id).delete();
+                return {success: true, data: `Succesfully deleted user.`}
+            } else {
+                return {success: false, data: `Cannot find user.`};
             }
+        } catch (error){
+            return {success: false, data: error};
+        }
+    }
 
-            if (check === 0){
-                return { 
-                    success: false, 
-                    data: `Email ${email} is not in the database`, 
-                };
+    async verifyLogin(email: string, password: string): Promise<CRUDReturn>{
+        try {
+            var userResults = await this.DB.collection("users")
+                .where("email", "==", email)
+                .get();
+           
+            if (!userResults.empty){
+                for (const doc of userResults.docs){
+                    if (doc.data()["email"] === email){
+                        if (doc.data()["password"] === password){
+                            return {
+                                success: true,
+                                data: `Succesfully logged in!`,
+                            };
+                        } else {
+                            return {
+                                success: false,
+                                data: `Incorrect Password!`,
+                            };
+                        }
+                    } else {
+                        return {
+                            success: false,
+                            data: `Email ${email} is not in the database`,
+                        }
+                    }
+                }
+            } else {
+                return {
+                    success: false,
+                    data: `Email ${email} is not in the database`,
+                }
             }
         } catch (error) {
             return { 
@@ -206,33 +250,148 @@ export class UserService {
     }
 
     //finish
-    searchUser(term:string): CRUDReturn{
-        var results: Array<any> = [];
-        for (const user of this.users.values()) {
-            if (user.matches(term)){
-                results.push(user.toJson());
-            }
-        }
-        return {
-            success: results.length>0,
-            data: results,
-        };
-    }
-
-    //finish
-    checkExistingUsers(term:string): boolean{
-        for (const user of this.users.values()) {
-            if (user.search(term) === true){
-                return true;
-            }
-        }
-    }
-
-    //finish
-    saveToDB(user: User): boolean{
+    async searchUser(term:string): Promise<CRUDReturn>{
+        // var results: Array<any> = [];
+        // for (const user of this.users.values()) {
+        //     if (user.matches(term)){
+        //         results.push(user.toJson());
+        //     }
+        // }
+        // return {
+        //     success: results.length>0,
+        //     data: results,
+        // };
         try {
-            this.users.set(user.id, user);
-            return this.users.has(user.id);
+            var doesExists: number = 0;
+            var intCheck: number = parseInt(term);
+            var results: Array<User> = [];
+            var dbDataID: FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData> = 
+                await this.DB.collection("users").where("id", "==", term).get();
+            var dbDataName: FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData> = 
+                await this.DB.collection("users").where("name", "==", term).get();
+            var dbDataEmail: FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData> = 
+                await this.DB.collection("users").where("email", "==", term).get();
+            var dbDataAge: FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData> = 
+                await this.DB.collection("users").where("age", "==", intCheck).get();
+            dbDataID.forEach((doc)=>{
+                if (doc.exists) {
+                    doesExists++;
+                    var data = doc.data();
+                    results.push( new User(
+                        data["name"],
+                        data["age"],
+                        data["email"],
+                        data["id"],
+                    ));
+                }
+            });
+            dbDataName.forEach((doc)=>{
+                if (doc.exists) {
+                    doesExists++;
+                    var data = doc.data();
+                    results.push( new User(
+                        data["name"],
+                        data["age"],
+                        data["email"],
+                        data["id"],
+                    ));
+                }
+            });
+            dbDataAge.forEach((doc)=>{
+                if (doc.exists) {
+                    doesExists++;
+                    var data = doc.data();
+                    results.push( new User(
+                        data["name"],
+                        data["age"],
+                        data["email"],
+                        data["id"],
+                    ));
+                }
+            });
+            dbDataEmail.forEach((doc)=>{
+                if (doc.exists) {
+                    doesExists++;
+                    var data = doc.data();
+                    results.push( new User(
+                        data["name"],
+                        data["age"],
+                        data["email"],
+                        data["id"],
+                    ));
+                }
+            });
+            
+            if (doesExists != 0){
+                console.log(typeof term);
+                return{
+                    success: true,
+                    data: results,
+                };
+            } else {
+                return{
+                    success: false,
+                    data: `Cannot find anything related to ${term}`,
+                };
+            }
+        } catch (error) {
+            console.log(error);
+            return{
+                success: false,
+                data: error.message,
+            };
+        }
+    }
+
+    
+    //initial
+    // checkExistingUsers(term:string): boolean{
+    //     for (const user of this.users.values()) {
+    //         if (user.search(term) === true){
+    //             return true;
+    //         }
+    //     }
+    // }
+
+    async checkExistingUsers(email:string, options?: {exceptionID: string}): Promise<boolean>{
+        try{
+            var userResults = await this.DB.collection("users")
+                .where("email", "==", email)
+                .get();
+            console.log("Are the user results empty?");
+            console.log(userResults.empty);
+            if (userResults.empty) {
+                return false;
+            }
+            for (const doc of userResults.docs){
+                console.log(doc.data());
+                console.log("Are the options defined?");
+                console.log(options != undefined);
+                if (options != undefined){
+                    if (doc.id == options?.exceptionID) continue;
+                }
+                if (doc.data()["email"] === email) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        } catch (error){
+            console.log("Email exists subfunction error");
+            console.log(error.message);
+            return false;
+        }
+    }
+
+    //finish
+    async saveToDB(user: User): Promise<boolean>{
+        try {
+            var result = await user.commit();
+            return result.success;
+            // var vcut = this.DB.collection("users").doc(user.id).set(user.toJson());
+            // console.log(vcut);
+            // this.users.set(user.id, user);
+            // return this.users.has(user.id);
         } catch (error) {
             console.log(error);
             return false;

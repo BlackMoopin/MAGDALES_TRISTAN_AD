@@ -1,4 +1,5 @@
 import { userInfo } from "os";
+import * as admin from 'firebase-admin';
 import { CRUDReturn } from "./crud_return.interface";
 import { Helper } from "./user.resource/helper";
 
@@ -10,12 +11,51 @@ export class User {
     private email: string;
     private password: string;
 
-    constructor(name:string, age:number, email:string, password:string){
-        this.id = Helper.generateUID();
+    constructor(name:string, age:number, email:string, password:string, id?:string){
+        if (id!=undefined){
+            this.id = id;
+        } else {
+            this.id = Helper.generateUID();
+        }
         this.name = name;
         this.age = age; 
         this.email = email;
         this.password = password;
+    }
+
+    static async retrieve (id:string): Promise<User>{
+        try {
+            var DB = admin.firestore();
+            var result = await DB.collection("users").doc(id).get();
+            if (result.exists){
+                var data = result.data();
+                return new User(
+                    result.id, 
+                    data['name'], 
+                    data['age'], 
+                    data['email'], 
+                    data['password']
+                );
+            }
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
+    }
+
+    async commit(): Promise<CRUDReturn> {
+        try {
+            var DB = admin.firestore();
+            var result = await DB.collection("users").doc(this.id).set(this.toJson());
+            console.log(result);
+            return {
+                success: true,
+                data: this.toJson(),
+            };
+        } catch (error) {
+            console.log(error);
+            return {success: false, data: error};
+        }
     }
 
     log(){
@@ -87,7 +127,7 @@ export class User {
     }
 
     //for patch
-    update(user:any){
+    async update(user:any): Promise<boolean>{
         var changed = false;
         if (user.name){
             if (typeof user.name === 'string'){
@@ -113,7 +153,7 @@ export class User {
                 changed = true;
             }
         }
-
+ 
         return changed;
     }
 
@@ -129,10 +169,19 @@ export class User {
 
     toJson(){
         return{
+            name: this.name,
+            age: this.age,
+            email: this.email,
+            password: this.password,
+        }
+    }
+
+    toJsonID(){
+        return{
             id: this.id,
             name: this.name,
             age: this.age,
-            email: this.email
+            email: this.email,
         }
     }
 

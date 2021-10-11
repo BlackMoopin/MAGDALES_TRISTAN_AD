@@ -38,7 +38,7 @@ export class UserController {
 
     @Post("/login")
     userLogin(@Body("email") email:string, @Body("password") password:string){
-        return this.userService.check(email, password);
+        return this.userService.verifyLogin(email, password);
     }
 
     @Get("/search/:term")
