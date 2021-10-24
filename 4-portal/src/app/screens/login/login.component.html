@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Portal</title>
+    <link rel="stylesheet" href="login.component.scss">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="mainContent">
+        <div class="login">
+            <div class="inputs">
+                <h1>SIGN IN</h1>
+                <label for="EMAIL">Email</label>
+                <input type="email" name="EMAIL" [formControl]="fcEmail">
+                <label for="PASSWORD">Password</label>
+                <input type="password" name="PASSWORD" [formControl]="fcPassword">
+            </div>
+            <div class="actions">
+
+                <button (click)="login()">LOGIN</button>
+                <button (click)="nav('register')">REGISTER</button>
+            </div>
+            <p>{{requestResult | json}}</p>
+            <!-- <div class="status">
+                <p>Email: {{fCEmail.value}}</p>
+                <p>Password: {{fCPassword.value}}</p>
+            </div> -->
+            <div class="side"></div>
+        </div>
+    </div>
+</body>
+
+</html>
