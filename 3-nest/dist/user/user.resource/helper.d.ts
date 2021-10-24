@@ -1,4 +1,4 @@
-import { User } from '../user.model';
+import { User } from './user.model';
 export declare class Helper {
     static describeClass(typeOfClass: any): Array<any>;
     static generateUID(): string;

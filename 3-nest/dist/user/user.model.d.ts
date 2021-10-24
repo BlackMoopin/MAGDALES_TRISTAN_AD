@@ -3,27 +3,22 @@ export declare class User {
     id: string;
     private name;
     private age;
-    private email;
+    email: string;
     private password;
     constructor(name: string, age: number, email: string, password: string, id?: string);
     static retrieve(id: string): Promise<User>;
-    commit(): Promise<CRUDReturn>;
-    log(): void;
+    static retrieveViaEmail(email: string): Promise<User>;
+    delete(): Promise<boolean>;
+    commit(hidePassword?: boolean): Promise<CRUDReturn>;
+    toJson(hidePassword?: boolean): {
+        id?: string;
+        name: string;
+        age: number;
+        email: string;
+        password?: string;
+    };
     login(password: string): CRUDReturn;
-    search(term: any): boolean;
-    replaceAllValues(body: any): boolean;
-    update(user: any): Promise<boolean>;
     matches(term: string): boolean;
-    toJson(): {
-        name: string;
-        age: number;
-        email: string;
-        password: string;
-    };
-    toJsonID(): {
-        id: string;
-        name: string;
-        age: number;
-        email: string;
-    };
+    replaceValues(body: any): boolean;
+    log(): void;
 }

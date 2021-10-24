@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Helper = void 0;
-const user_model_1 = require("../user.model");
+const user_model_1 = require("./user.model");
 const uuid_1 = require("uuid");
 class Helper {
     static describeClass(typeOfClass) {
@@ -34,13 +34,14 @@ class Helper {
             return result;
         }
         catch (error) {
-            console.log(error);
+            console.log("Helper.populate error");
+            console.log(error.message);
             return null;
         }
     }
     static validBody(body) {
         try {
-            var keys = Helper.describeClass(user_model_1.User);
+            var keys = ['name', 'age', 'email', 'password'];
             var types = new Map();
             types.set('name', typeof '');
             types.set('age', typeof 0);
@@ -57,7 +58,7 @@ class Helper {
             return { valid: true, data: null };
         }
         catch (error) {
-            return { valid: false, data: error.message };
+            return { valid: false, data: error.message, };
         }
     }
     static validBodyPut(body) {
@@ -72,15 +73,15 @@ class Helper {
                     }
                 }
                 if (keys.length > 0) {
-                    throw Error(`Payload is missing ${keys}`);
+                    throw new Error(`Payload is missing ${keys}`);
                 }
                 return { valid: true, data: null };
             }
             else
-                throw Error(bodyValidation.data);
+                throw new Error(bodyValidation.data);
         }
         catch (error) {
-            return { valid: false, data: error.message };
+            return { valid: false, data: error.message, };
         }
     }
 }

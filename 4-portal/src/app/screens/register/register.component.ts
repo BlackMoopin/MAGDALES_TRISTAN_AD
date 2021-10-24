@@ -1,6 +1,8 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-register',
@@ -8,7 +10,9 @@ import { Router } from '@angular/router';
   styleUrls: ['./register.component.scss'],
 })
 export class RegisterComponent implements OnInit {
-  constructor(private router: Router) {}
+  payload: any;
+
+  constructor(private router: Router, private api: HttpClient) {}
 
   registerForm: FormGroup = new FormGroup({
     fcName: new FormControl('', Validators.required),
@@ -22,19 +26,23 @@ export class RegisterComponent implements OnInit {
 
   ngOnInit(): void {}
 
+  fCEmail = new FormControl();
+  fCPassword = new FormControl();
+  fCAge = new FormControl();
+  fCName = new FormControl();
+  requestResult = '';
+
   onSubmit() {
     if (
       this.registerForm.value['fcPassword'] !==
       this.registerForm.value['fcPassword2']
     ) {
-      alert("Password Doesn't Match!");
-      console.log("Wrong Credentials");
+      alert('Password Does not match!');
       return;
     }
     if (!this.registerForm.valid) {
       {
-        alert("No fields must be empty");
-        console.log("Lacking Payload");
+        alert('Please fill out all data.');
         return;
       }
     }
@@ -45,14 +53,34 @@ export class RegisterComponent implements OnInit {
         age: number;
         password: string;
       };
+
       payload = {
         name: this.registerForm.value.fcName,
         age: this.registerForm.value.fcAge,
         email: this.registerForm.value.fcEmail,
         password: this.registerForm.value.fcPassword,
       };
+
       console.log(payload);
     }
+  }
+
+  async register() {
+    var result: any = await this.api
+      .post(environment.API_URL + '/user/register', {
+        name: this.registerForm.value.fcName,
+        age: this.registerForm.value.fcAge,
+        email: this.registerForm.value.fcEmail,
+        password: this.registerForm.value.fcPassword,
+      })
+      .toPromise();
+
+    if (result.success) {
+      this.nav('home');
+      alert('Succesfully created user!');
+    }
+    console.log(result.success);
+    this.requestResult = result.data;
   }
 
   nav(destination: string) {

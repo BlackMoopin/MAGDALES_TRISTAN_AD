@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
 const admin = require("firebase-admin");
-const helper_1 = require("./user.resource/helper");
+const helper_1 = require("./helper");
 class User {
     constructor(name, age, email, password, id) {
         if (id != undefined) {
@@ -22,33 +22,74 @@ class User {
             var result = await DB.collection("users").doc(id).get();
             if (result.exists) {
                 var data = result.data();
-                return new User(result.id, data['name'], data['age'], data['email'], data['password']);
+                return new User(data["name"], data["age"], data["email"], data["password"], result.id);
+            }
+            else {
+                return null;
             }
         }
         catch (error) {
-            console.log(error);
+            console.log("User.retrieve error");
+            console.log(error.message);
             return null;
         }
     }
-    async commit() {
+    static async retrieveViaEmail(email) {
+        var DB = admin.firestore();
+        var userResults = await DB.collection("users")
+            .where("email", "==", email)
+            .get();
+        if (userResults.empty)
+            return null;
+        for (const doc of userResults.docs) {
+            var data = doc.data();
+            return new User(data["name"], data["age"], data["email"], data["password"], doc.id);
+        }
+    }
+    async delete() {
         try {
             var DB = admin.firestore();
-            var result = await DB.collection("users").doc(this.id).set(this.toJson());
-            console.log(result);
+            await DB.collection("users").doc(this.id).delete();
+            return true;
+        }
+        catch (error) {
+            console.log("User.delete error");
+            console.log(error.message);
+            return false;
+        }
+    }
+    async commit(hidePassword = true) {
+        try {
+            var DB = admin.firestore();
+            var result = await DB.collection("users").doc(this.id).set(this.toJson(hidePassword));
             return {
                 success: true,
-                data: this.toJson(),
+                data: this.toJson(true),
             };
         }
         catch (error) {
-            console.log(error);
-            return { success: false, data: error };
+            console.log("User.committ error message");
+            console.log(error.message);
+            return { success: false, data: error.message, };
         }
     }
-    log() {
-        console.log(`${this.id}:${this.name}:${this.age}:${this.email}`);
+    toJson(hidePassword = true) {
+        if (hidePassword)
+            return {
+                id: this.id,
+                name: this.name,
+                age: this.age,
+                email: this.email,
+            };
+        return {
+            name: this.name,
+            age: this.age,
+            email: this.email,
+            password: this.password,
+        };
     }
     login(password) {
+        console.log(`current password ${this.password}, attempt: ${password}`);
         try {
             if (this.password === password) {
                 return { success: true, data: this.toJson() };
@@ -58,109 +99,35 @@ class User {
             }
         }
         catch (error) {
-            return { success: false, data: error.message };
+            return { success: false, data: error.message, };
         }
-    }
-    search(term) {
-        if (term === this.id) {
-            return true;
-        }
-        if (term === this.name) {
-            return true;
-        }
-        if (term === this.age) {
-            return true;
-        }
-        if (term === this.email) {
-            return true;
-        }
-    }
-    replaceAllValues(body) {
-        var changed = 0;
-        if (body.name) {
-            if (typeof body.name === 'string') {
-                this.name = body.name;
-                changed++;
-            }
-        }
-        if (body.age) {
-            if (typeof body.age === typeof 0) {
-                this.age = parseInt(body.age);
-                changed++;
-            }
-        }
-        if (body.email) {
-            if (typeof body.email === 'string') {
-                this.email = body.email;
-                changed++;
-            }
-        }
-        if (body.password) {
-            if (typeof body.password === 'string') {
-                this.password = body.password;
-                changed++;
-            }
-        }
-        console.log(changed);
-        if (changed === 4) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-    async update(user) {
-        var changed = false;
-        if (user.name) {
-            if (typeof user.name === 'string') {
-                this.name = user.name;
-                changed = true;
-            }
-        }
-        if (user.age) {
-            if (typeof user.age === 'number') {
-                this.age = parseInt(user.age);
-                changed = true;
-            }
-        }
-        if (user.email) {
-            if (typeof user.email === 'string') {
-                this.email = user.email;
-                changed = true;
-            }
-        }
-        if (user.password) {
-            if (typeof user.password === 'string') {
-                this.password = user.password;
-                changed = true;
-            }
-        }
-        return changed;
     }
     matches(term) {
         var keys = helper_1.Helper.describeClass(User);
-        keys = helper_1.Helper.removeItemOnce(keys, 'password');
+        keys = helper_1.Helper.removeItemOnce(keys, "password");
         for (const key of keys) {
-            if (`${this[key]}` === term) {
+            if (`${this[key]}` === term)
                 return true;
+        }
+        return false;
+    }
+    replaceValues(body) {
+        try {
+            var keys = helper_1.Helper.describeClass(User);
+            keys = helper_1.Helper.removeItemOnce(keys, "id");
+            for (const key of Object.keys(body)) {
+                this[key] = body[key];
             }
+            return true;
+        }
+        catch (error) {
+            console.log("User.replaceValues error");
+            console.log(error.message);
+            return false;
         }
     }
-    toJson() {
-        return {
-            name: this.name,
-            age: this.age,
-            email: this.email,
-            password: this.password,
-        };
-    }
-    toJsonID() {
-        return {
-            id: this.id,
-            name: this.name,
-            age: this.age,
-            email: this.email,
-        };
+    log() {
+        console.log(this.toJson());
     }
 }
 exports.User = User;

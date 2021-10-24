@@ -1,51 +1,64 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put } from '@nestjs/common';
-import { UserService } from './user.service';
-
-@Controller('user')
-export class UserController {
-
-    constructor(private readonly userService:UserService){}
-
-    @Get("/all")
-    getAllUsers(@Body() body:any){
-        return this.userService.userLog();
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    Param,
+    Patch,
+    Post,
+    Put,
+  } from '@nestjs/common';
+  
+  import { UserService } from './user.service';
+  
+  @Controller('user')
+  export class UserController {
+    constructor(private readonly userService: UserService) {}
+    @Post('/register')
+    register(@Body() body: any) {
+      return this.userService.register(body);
     }
-
-    @Get("/:id")
-    getOneUser(@Param("id") id:string){
-        return this.userService.getUser(id);
+  
+    @Post('/login')
+    login(@Body('email') email: string, @Body('password') password: string) {
+      return this.userService.login(email, password);
     }
-
-    @Post("/register")
-    postUser(@Body() body:any){
-        return this.userService.addUser(body);
+  
+    @Get('/all')
+    getAllUser() {
+      return this.userService.getAll();
     }
-
-    @Put("/:id")
-    replaceInfo(@Body() body:any, @Param("id") id:string){
-        return this.userService.replaceUser(body, id);
+    @Get('/search/:term')
+    searchUser(@Param('term') term: string) {
+      return this.userService.searchUser(term);
     }
-
-    @Patch("/:id")
-    updateInfo(@Body() body:any, @Param("id") id:string){
-        return this.userService.updateUser(body, id);
+  
+    @Get('/:id')
+    getUserID(@Param('id') id: string) {
+      return this.userService.getOne(id);
     }
-
-    @Delete("/:id")
-    delete(@Param("id") id:string){
-        return this.userService.deleteUser(id);
+  
+    @Put('/:id')
+    replaceValuePut(@Param('id') id: string, @Body() body: any) {
+      return this.userService.replaceValuePut(id, body);
     }
-
-    @Post("/login")
-    userLogin(@Body("email") email:string, @Body("password") password:string){
-        return this.userService.verifyLogin(email, password);
+    @Patch('/reset')
+    resetDatabase() {
+      return this.userService.resetDatabase();
     }
-
-    @Get("/search/:term")
-    findUser(@Param("term") term:any){
-        return this.userService.searchUser(term);
+  
+    @Patch('/:id')
+    replaceValuePatch(@Param('id') id: string, @Body() body: any) {
+      return this.userService.replaceValuePatch(id, body);
     }
-
-    
-
-}
+  
+  
+  
+    @Delete('/:id')
+    deleteUser(@Param('id') id: string) {
+      return this.userService.deleteUser(id);
+    }
+  
+  
+  
+  }

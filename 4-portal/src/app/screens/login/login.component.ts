@@ -21,9 +21,16 @@ export class LoginComponent implements OnInit {
   requestResult = '';
 
     async login() { 
-      var result:any = await this.api.post(environment.API_URL+"/user/login", {"email": this.fcEmail.value, "password": this.fcPassword.value}).toPromise();
-      this.requestResult = result.data;
-      console.log(this.requestResult); 
+      var result:any = await this.api.post(environment.API_URL+"/user/login", {
+        email: this.fcEmail.value, 
+        password: this.fcPassword.value
+      })
+      .toPromise();
+      if(result.success){
+        this.nav('home');
+      } else {
+        alert('Your Email or Password is Incorrect');
+      }
       // if (this.fcEmail.value == "magdalestj@gmail.com" && this.fcPassword.value == "ilovemommy123"){
       //   this.router.navigate(["home"]);
       // } else {
