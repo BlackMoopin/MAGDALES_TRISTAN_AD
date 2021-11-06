@@ -66,7 +66,9 @@ export class RegisterComponent implements OnInit {
   }
 
   async register() {
-    var result: any = await this.api
+    if (this.registerForm.value['fcPassword'] == this.registerForm.value['fcPassword2']
+    ) {
+      var result: any = await this.api
       .post(environment.API_URL + '/user/register', {
         name: this.registerForm.value.fcName,
         age: this.registerForm.value.fcAge,
@@ -74,13 +76,21 @@ export class RegisterComponent implements OnInit {
         password: this.registerForm.value.fcPassword,
       })
       .toPromise();
+      
+      if (result.success) {
+        this.nav('home');
+        alert('Succesfully created user!');
+      } else {
+        alert('Email already exists!');
+      }
+      console.log(result.success);
+      this.requestResult = result.data;
 
-    if (result.success) {
-      this.nav('home');
-      alert('Succesfully created user!');
+    } else {
+      alert('Password does not match!');
     }
-    console.log(result.success);
-    this.requestResult = result.data;
+    
+
   }
 
   nav(destination: string) {

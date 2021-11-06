@@ -13,12 +13,147 @@
 
 <body>
     <div class="mainContent">
-        <div class="greeting">
-            <div>
-                <h1>Welcome!</h1>
+        <div class="header">
+            <h1>My Portal</h1>
+            <ul class="actions">
+                <li>
+                    <p (click)="displayAll()" style="cursor: pointer;">
+                        Display All Users
+                    </p>
+                </li>
+                <li>
+                    <p (click)="displayDelete()" style="cursor: pointer;">
+                        Delete User
+                    </p>
+                </li>
+                <li>
+                    <p (click)="displaySearch()" style="cursor: pointer;">
+                        Search User
+                    </p>
+                </li>
+                <li>
+                    <p (click)="showEditUser()" style="cursor: pointer;">
+                        Edit User
+                    </p>
+                </li>
+            </ul>
+        </div>
+
+        <div class="searchBar" *ngIf="showSearchBar">
+            <form class="search" [formGroup]="searchForm">
+                <input class=" searchTerm " type="text " name="Term " placeholder="Enter User ID or Info " formControlName="fcSearch" />
+            </form>
+            <button class="searchButton " [disabled]="!searchForm.valid " type="search " (click)="searchUserAndTerm() " [formGroup]="searchForm">Search</button>
+        </div>
+
+        <div class="searchBar" *ngIf="showDelete">
+            <form class="search" [formGroup]="searchForm">
+                <input class=" searchTerm " type="text " name="Term " placeholder="Enter ID of User to be Deleted" formControlName="fcSearch" />
+            </form>
+            <button class="searchButton " [disabled]="!searchForm.valid " type="search " (click)="deleteUser() " [formGroup]="searchForm">Delete</button>
+        </div>
+
+        <div class="searchBar" *ngIf="showEditBar">
+            <form class="search" [formGroup]="searchForm">
+                <input class=" searchTerm " type="text " name="Term " placeholder="Enter User ID " formControlName="fcSearch" />
+            </form>
+            <button class="searchButton " [disabled]="!searchForm.valid " type="search " (click)="editUser() " [formGroup]="searchForm">Edit</button>
+        </div>
+
+        <div class="output ">
+            <div class="inOutput ">
+                <table class="tableElements ">
+                    <thead *ngIf="allUsers ">
+                        <tr>
+                            <th>Number</th>
+                            <th>User ID</th>
+                            <th>User Name</th>
+                            <th>User Age</th>
+                            <th>User Email</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <ng-container *ngIf="allUsers; then all;">
+                        </ng-container>
+                        <ng-container *ngIf="oneUser; then one;">
+                        </ng-container>
+                        <ng-container *ngIf="showEdit; then edit;">
+                        </ng-container>
+                    </tbody>
+
+                    <ng-template #all>
+                        <tr *ngFor="let result of requestResult; index as i">
+                            <td>{{ i+1 }}</td>
+                            <td>{{ result.id }}</td>
+                            <td>{{ result.name }}</td>
+                            <td>{{ result.age }}</td>
+                            <td>{{ result.email }}</td>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template #one>
+                        <tr><b class="title">User Info</b></tr>
+                        <div class="showOneUser">
+                            <tr class=" onlyOne " *ngIf="oneUser ">
+                                <td><b class="id ">ID:</b>{{ requestResult.id }}</td>
+                            </tr>
+                            <tr class="onlyOne " *ngIf="oneUser ">
+                                <td><b class="name ">Name:</b>{{ requestResult.name }}</td>
+                            </tr>
+                            <tr class="onlyOne " *ngIf="oneUser ">
+                                <td><b class="age ">Age:</b>{{ requestResult.age }}</td>
+                            </tr>
+                            <tr class="onlyOne " *ngIf="oneUser ">
+                                <td><b class="email ">Email:</b>{{ requestResult.email }}</td>
+                            </tr>
+                            <div class="spacer ">
+                            </div>
+
+
+                        </div>
+                    </ng-template>
+
+                    <ng-template #edit>
+                        <tr><b class="title ">Edit User Info</b></tr>
+
+                        <div class=" editUser ">
+                            <form class="editDiv " id="login " [formGroup]="editForm " (ngSubmit)="onSubmit() ">
+                                <tr class="onlyOne ">
+                                    <td>
+                                        <label><b class="name ">Name: </b></label>
+                                        <input type="!name" name="name " id="name " placeholder="Name " formControlName="fcName" />
+                                    </td>
+
+                                </tr>
+                                <tr class="onlyOne ">
+                                    <td>
+                                        <label><b class="age ">Age: </b></label>
+                                        <input type="number" name="Age1 " id="Age1 " placeholder="Age " formControlName="fcAge" />
+                                    </td>
+
+                                </tr>
+                                <tr class="onlyOne ">
+                                    <td>
+                                        <label><b class="email ">Email: </b></label>
+                                        <input type="email" name="email1 " id="email1 " placeholder="Email " formControlName="fcEmail" />
+                                    </td>
+
+                                </tr>
+
+                            </form>
+                            <div class="actions ">
+                                <button class="editButton" type="submit " id="createAcc " (click)="confirmEdit() " [formGroup]="editForm ">Confirm Changes</button>
+                            </div>
+                        </div>
+                    </ng-template>
+
+                </table>
             </div>
         </div>
 
+        <div>
+            <button class="logoutButton " (click)="nav( 'login') ">Log Out</button>
+        </div>
     </div>
 </body>
 

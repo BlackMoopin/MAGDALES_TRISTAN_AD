@@ -1,46 +1,231 @@
-* {
-    margin: 0;
-    padding: 0;
+td {
+    padding: 12px 15px;
 }
 
-html {
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-}
-
-*,
-*:before,
-*:after {
-    -webkit-box-sizing: inherit;
-    -moz-box-sizing: inherit;
-    box-sizing: inherit;
+.tableElements {
+    border-collapse: collapse;
+    margin: auto;
+    text-align: center;
+    width: 85%;
 }
 
 .mainContent {
-    width: 100vw;
-    height: 100vh;
-    display: grid;
-    justify-content: center;
-    align-content: center;
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 18px;
+    line-height: 28px;
     background-image: url("./bg/background.png");
     background-repeat: no-repeat;
-    background-size: cover;
     background-position: center;
-    background-color: rgb(198, 213, 226);
-    background-position: right;
-    font-family: 'Montserrat', sans-serif;
+    background-size: cover;
+    width: 100vw;
+    height: 100vh;
 }
 
-.greeting {
-    background-color: white;
-    border-radius: 24px;
-    padding: 24px;
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: #f9fafb;
+    height: 80px;
     display: flex;
-    justify-content: center;
-    width: 400px;
+    justify-content: space-around;
+    padding-top: 20px;
+    margin: auto;
+}
+
+.searchBar {
+    margin-top: 20px;
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 0;
+    display: flex;
+}
+
+.search {
+    width: 100%;
+}
+
+.searchTerm {
+    width: 95%;
+    height: 40px;
+    border-radius: 15px;
+    border: none;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 18px;
+    padding: 10px;
+}
+
+.searchButton {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 20px;
+    font-weight: bolder;
+    width: 20%;
+    height: 40px;
+    text-align: center;
+    color: #348681;
+    background-color: white;
+    border-radius: 15px;
+    border: none;
+}
+
+button:disabled,
+.searchButton[disabled],
+.searchButton:hover:disabled {
+    background-color: #2e2e2e;
+    color: grey;
+}
+
+.searchButton:hover:enabled {
+    background-color: #348681;
+    color: white;
+}
+
+input:focus {
+    outline: 0;
+}
+
+input {
+    width: 300px;
+    height: 30px;
+    border-radius: 12px;
+    border-color: slateblue;
+    border-style: none;
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.144), 0 0 10px rgb(119, 119, 119), 0 0 5px rgba(252, 252, 252, 0.089);
+}
+
+.actions {
+    display: flex;
+    justify-content: space-between;
+    width: 40%;
+    list-style: none;
+    color: #4d5a6d;
 }
 
 h1 {
     color: #348681;
+    margin: 0;
+    padding: 0;
+}
+
+.output {
+    width: 80%;
+    height: 70%;
+    background: rgb(255, 255, 255);
+    border-radius: 50px;
+    margin: 0 auto;
+    margin-top: 20px;
+}
+
+.inOutput {
+    margin: auto;
+    padding-top: 24px;
+}
+
+.tableElements th {
+    color: #4d5a6d;
+}
+
+.logoutButton {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 30px;
+    font-weight: bolder;
+    margin: auto;
+    margin-top: 50px;
+    margin-right: 50px;
+    position: sticky;
+    display: flex;
+    width: 200px;
+    height: 60px;
+    text-align: center;
+    justify-content: center;
+    color: white;
+    background-color: transparent;
+    border-radius: 15px;
+    border: none;
+    padding-top: 10px;
+}
+
+.logoutButton:hover {
+    color: #f7f7f7;
+    background-color: #348681;
+}
+
+.onlyOne {
+    margin: 0;
+    padding: 0;
+    justify-self: left;
+    text-align: left;
+}
+
+.editDiv {
+    display: grid;
+}
+
+.editUser {
+    margin-top: 20px;
+}
+
+button:disabled,
+.editButton[disabled],
+.editButton:hover:disabled {
+    background-color: #2e2e2e;
+    color: grey;
+}
+
+.editButton {
+    font-family: 'Montserrat', sans-serif;
+    height: 40px;
+    width: 200px;
+    border-radius: 15px;
+    border: none;
+    margin-top: 30px;
+    color: #348681;
+}
+
+.editButton:hover:enabled {
+    color: #f7f7f7;
+    background-color: #348681;
+}
+
+.showOneUser {
+    margin-top: 20px;
+}
+
+.title {
+    margin: 0 auto;
+    border-bottom: 2px;
+    border-left: 0;
+    border-right: 0;
+    border-top: 0;
+    border-style: solid;
+    border-color: #348681;
+    width: 20%;
+    padding: 0;
+    color: #348681;
+}
+
+.spacer {
+    height: 50px;
+}
+
+.id {
+    color: #348681;
+    padding-right: 45px;
+}
+
+.name {
+    color: #348681;
+    padding-right: 10px;
+}
+
+.age {
+    color: #348681;
+    padding-right: 29px;
+}
+
+.email {
+    color: #348681;
+    padding-right: 14px;
 }

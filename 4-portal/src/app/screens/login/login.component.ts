@@ -31,12 +31,7 @@ export class LoginComponent implements OnInit {
       } else {
         alert('Your Email or Password is Incorrect');
       }
-      // if (this.fcEmail.value == "magdalestj@gmail.com" && this.fcPassword.value == "ilovemommy123"){
-      //   this.router.navigate(["home"]);
-      // } else {
-      //   alert("Incorrect Credentials");
-      //   console.log("Wrong Credentials");
-      // }
+      
     } 
 
     nav(destination:string){

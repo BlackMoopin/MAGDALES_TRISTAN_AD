@@ -1,110 +1,92 @@
-    * {
-        margin: 0;
-        padding: 0;
-    }
-    
-    html {
-        -webkit-box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        box-sizing: border-box;
-    }
-    
-    *,
-    *:before,
-    *:after {
-        -webkit-box-sizing: inherit;
-        -moz-box-sizing: inherit;
-        box-sizing: inherit;
-    }
-    
-    body {
-        background-image: url("./bg/background.png");
-        background-repeat: no-repeat;
-        background-size: cover;
-        background-position: center;
-        background-color: rgb(198, 213, 226);
-        background-position: right;
-        font-family: 'Montserrat', sans-serif;
-    }
-    
-    .mainContent {
-        width: 100vw;
-        height: 100vh;
-        display: grid;
-        justify-content: left;
-        align-content: center;
-    }
-    
-    .login {
-        background-image: linear-gradient(rgb(241, 241, 241), white, white, white, rgb(241, 241, 241));
-        width: 40vw;
-        height: 100vh;
-        padding: 24px;
-        flex-direction: column;
-        justify-content: center;
-        align-content: center;
-    }
-    
-    .actions {
-        align-content: center;
-        display: flex;
-        flex-direction: row;
-        padding-bottom: 12px;
-        margin-bottom: 7vh;
-    }
-    
-    label {
-        padding-bottom: 8px;
-        padding-top: 8px;
-        padding-left: 4vw;
-        color: black;
-        font-weight: bold;
-        font-family: 'Montserrat', sans-serif;
-        margin-top: 3vh;
-        margin-bottom: 1vh;
-    }
-    
-    h1 {
-        color: #4FCCC4;
-        font-weight: bolder;
-        padding: 50px;
-        padding-left: 4vw;
-    }
-    
-    .inputs {
-        display: flex;
-        flex-direction: column;
-        padding-bottom: 12px;
-        margin-top: 3vh;
-        margin-bottom: 7vh;
-    }
-    
-    input {
-        margin: 0 auto;
-        width: 80%;
-        height: 40px;
-        border-radius: 12px;
-        border-color: slateblue;
-        border-style: none;
-        box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.144), 0 0 10px rgb(119, 119, 119), 0 0 5px rgba(252, 252, 252, 0.089);
-    }
-    
-    .status {
-        margin: 0 auto;
-        padding-left: 65px;
-    }
-    
-    button {
-        width: 30%;
-        height: 40px;
-        border-radius: 12px;
-        border-style: hidden;
-        transition-duration: 0.4s;
-        margin: 0 auto;
-        font-family: 'Montserrat', sans-serif;
-    }
-    
-    button:hover {
-        background-color: #4FCCC4;
-        color: white;
-    }
+body {
+    background-image: url("./bg/background.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-color: rgb(198, 213, 226);
+    background-position: right;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.mainContent {
+    width: 100vw;
+    height: 100vh;
+    display: grid;
+    justify-content: left;
+    align-content: center;
+}
+
+.login {
+    background-image: linear-gradient(rgb(241, 241, 241), white, white, white, rgb(241, 241, 241));
+    width: 40vw;
+    height: 100vh;
+    padding: 24px;
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
+}
+
+.actions {
+    align-content: center;
+    display: flex;
+    flex-direction: row;
+    padding-bottom: 12px;
+    margin-bottom: 7vh;
+}
+
+label {
+    padding-bottom: 8px;
+    padding-top: 8px;
+    padding-left: 4vw;
+    color: black;
+    font-weight: bold;
+    font-family: 'Montserrat', sans-serif;
+    margin-top: 3vh;
+    margin-bottom: 1vh;
+}
+
+h1 {
+    color: #4FCCC4;
+    font-weight: bolder;
+    padding: 50px;
+    padding-left: 4vw;
+}
+
+.inputs {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 12px;
+    margin-top: 3vh;
+    margin-bottom: 7vh;
+}
+
+input {
+    padding-left: 10px;
+    margin: 0 auto;
+    width: 80%;
+    height: 40px;
+    border-radius: 12px;
+    border-color: slateblue;
+    border-style: none;
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.144), 0 0 10px rgb(119, 119, 119), 0 0 5px rgba(252, 252, 252, 0.089);
+}
+
+.status {
+    margin: 0 auto;
+    padding-left: 65px;
+}
+
+button {
+    width: 30%;
+    height: 40px;
+    border-radius: 12px;
+    border-style: hidden;
+    transition-duration: 0.4s;
+    margin: 0 auto;
+    font-family: 'Montserrat', sans-serif;
+}
+
+button:hover {
+    background-color: #4FCCC4;
+    color: white;
+}

@@ -7,7 +7,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HomeComponent } from './screens/home/home.component';
 import { LoginComponent } from './screens/login/login.component';
-import { LoginModule } from './screens/login/login.module';
 import { RegisterComponent } from './screens/register/register.component';
 
 @NgModule({
